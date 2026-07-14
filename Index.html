@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Black Bull Den 🐂</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #8B0000, #FFD700);
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .container { padding: 20px; }
+    button {
+      background: #8B0000;
+      color: white;
+      border: none;
+      padding: 16px;
+      margin: 12px 0;
+      width: 100%;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .quiz-option {
+      background: #222;
+      padding: 14px;
+      margin: 8px 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .score { font-size: 22px; font-weight: bold; color: #FFD700; }
+  </style>
+</head>
+<body>
+  <div class="header">🐂 BLACK BULL DEN 🐂</div>
+  
+  <div class="container">
+    <h2>Charge Forward No Matter What!</h2>
+    <p>Welcome to $ANSEM Educational Hub</p>
+
+    <div class="card">
+      <h3>📚 Quick Learn</h3>
+      <button onclick="showSection('basics')">Crypto Basics</button>
+      <button onclick="showSection('memecoins')">Memecoins 101</button>
+      <button onclick="showSection('defi')">DeFi Explained</button>
+      <button onclick="showSection('ansem')">About $ANSEM</button>
+    </div>
+
+    <div class="card">
+      <h3>🧠 Test Your Knowledge</h3>
+      <button onclick="startQuiz(0)">Crypto Basics Quiz</button>
+      <button onclick="startQuiz(1)">Memecoins Quiz</button>
+      <button onclick="startQuiz(2)">$ANSEM Quiz</button>
+    </div>
+
+    <div id="quizContainer" class="card" style="display:none;"></div>
+
+    <div class="card">
+      <h3>🔥 Community</h3>
+      <button onclick="alert('Gallery & Uploads coming soon!')">🖼️ Open Gallery</button>
+      <button onclick="alert('Upload your bullpost soon!')">📤 Share Bullpost</button>
+    </div>
+  </div>
+
+  <script>
+    // Telegram Mini App
+    if (window.Telegram) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
+    let currentQuiz = 0;
+    let score = 0;
+    let questionIndex = 0;
+
+    const quizzes = [
+      { // Crypto Basics
+        title: "Crypto Basics Quiz",
+        questions: [
+          { q: "What is the main technology behind crypto?", a: ["Blockchain", "Bank servers", "Cloud"], correct: 0 },
+          { q: "Which blockchain is known for being fast and cheap?", a: ["Bitcoin", "Solana", "Ethereum"], correct: 1 }
+        ]
+      },
+      { // Memecoins
+        title: "Memecoins Quiz",
+        questions: [
+          { q: "Memecoins are mainly driven by...", a: ["Technology", "Community & memes", "Corporations"], correct: 1 },
+          { q: "Should you invest more than you can afford to lose?", a: ["Yes", "No"], correct: 1 }
+        ]
+      },
+      { // $ANSEM
+        title: "$ANSEM Quiz",
+        questions: [
+          { q: "What is the slogan of $ANSEM?", a: ["To the moon", "Charge Forward No Matter What", "HODL"], correct: 1 },
+          { q: "$ANSEM is built on which blockchain?", a: ["Ethereum", "Solana", "Binance Smart Chain"], correct: 1 }
+        ]
+      }
+    ];
+
+    function startQuiz(index) {
+      currentQuiz = index;
+      score = 0;
+      questionIndex = 0;
+      document.getElementById('quizContainer').style.display = 'block';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = quizzes[currentQuiz].questions[questionIndex];
+      let html = `<h3>${quizzes[currentQuiz].title}</h3>
+                  <p><strong>Question ${questionIndex + 1}/${q.length}</strong></p>
+                  <p>${q.q}</p>`;
+
+      q.a.forEach((answer, i) => {
+        html += `<div class="quiz-option" onclick="answer(${i})">${answer}</div>`;
+      });
+
+      document.getElementById('quizContainer').innerHTML = html;
+    }
+
+    function answer(selected) {
+      const correct = quizzes[currentQuiz].questions[questionIndex].correct;
+      if (selected === correct) score++;
+
+      questionIndex++;
+
+      if (questionIndex < quizzes[currentQuiz].questions.length) {
+        loadQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      const percent = Math.round((score / quizzes[currentQuiz].questions.length) * 100);
+      document.getElementById('quizContainer').innerHTML = `
+        <h3>Quiz Complete! 🐂</h3>
+        <p class="score">Your Score: ${score}/${quizzes[currentQuiz].questions.length} (${percent}%)</p>
+        <p>${percent > 70 ? "You're charging strong! 🔥" : "Keep learning and charge forward!"}</p>
+        <button onclick="document.getElementById('quizContainer').style.display='none'">Back to Menu</button>
+      `;
+    }
+
+    function showSection(section) {
+      let msg = "";
+      if (section === 'basics') msg = "Crypto = Digital money powered by blockchain. Solana is fast & cheap for memecoins.";
+      else if (section === 'memecoins') msg = "Memecoins are powered by community and memes. High risk, high reward. DYOR!";
+      else if (section === 'defi') msg = "DeFi = Banking without banks. Trade, lend, earn on blockchain.";
+      else if (section === 'ansem') msg = "$ANSEM is a community-driven memecoin on Solana. Slogan: Charge Forward No Matter What!";
+      
+      alert(msg);
+    }
+  </script>
+</body>
+</html>
